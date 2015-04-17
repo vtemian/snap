@@ -14,3 +14,6 @@ class TestParser(object):
 
     def test_div(self):
         assert parser.parse(lexer.lex('2/2')).eval() == 1
+
+    def test_open_param(self):
+        assert parser.parse(lexer.lex('(1+2)*(4-1)')).eval() == 9
