@@ -1,12 +1,12 @@
 from rply import ParserGenerator
 
-from ast import Number, Add, Sub, Mul, Div
+from ast import Number, Add, Sub, Mul, Div, String
 
 
 pg = ParserGenerator(
     # A list of all token names, accepted by the parser.
     ['NUMBER', 'OPEN_PARENS', 'CLOSE_PARENS',
-     'PLUS', 'MINUS', 'MUL', 'DIV'],
+     'PLUS', 'MINUS', 'MUL', 'DIV', 'STRING'],
     # A list of precedence rules with ascending precedence, to
     # disambiguate ambiguous production rules.
     precedence=[
@@ -21,6 +21,13 @@ def expression_number(p):
     # p is a list of the pieces matched by the right hand side of the
     # rule
     return Number(int(p[0].getstr()))
+
+
+@pg.production('expression : STRING')
+def expression_string(p):
+    # p is a list of the pieces matched by the right hand side of the
+    # rule
+    return String(str(p[0].getstr()))
 
 
 @pg.production('expression : OPEN_PARENS expression CLOSE_PARENS')
@@ -45,5 +52,12 @@ def expression_binop(p):
         return Div(left, right)
     else:
         raise AssertionError('Oops, this should not be possible!')
+
+
+@pg.error
+def error_handler(token):
+    error = "Ran into a %s where it was't expected" % token.gettokentype()
+    raise ValueError(error)
+
 
 parser = pg.build()
